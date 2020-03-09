@@ -17,8 +17,8 @@
             "App\\Tests\\": "tests"
         },
         "files": [
-          "src/config/loaders.php",
-          "src/config/schema.php"
+            "src/config/loaders.php",
+            "src/config/schema.php"
         ]
     },
     "require": {
