@@ -7,18 +7,26 @@ use App\User;
 
 class UsersTest extends BaseTest
 {
+    private $user1;
+    private $user2;
+    private $user3;
+
     public function setUp(): void
     {
         parent::setUp();
 
         $this->factory->create(User::class);
         $this->factory->create(User::class);
+
+        $this->user1 = $this->factory->create(User::class);
+        $this->user2 = $this->factory->create(User::class);
+        $this->user3 = $this->factory->create(User::class);
     }
 
     public function testIndex()
     {
         $users = Users::index();
-        $this->assertCount(4, $users);
+        $this->assertCount(7, $users);
     }
 
     public function testCreate()
@@ -55,5 +63,48 @@ class UsersTest extends BaseTest
         $user2 = User::find($user->id);
 
         $this->assertNull($user2);
+    }
+
+    public function testQuery()
+    {
+        $result = Users::indexQuery([]);
+        $this->assertCount(7, $result);
+
+        $params = [
+            'q' => [
+                'email' => $this->user1->email
+            ]
+        ];
+
+        $result = Users::indexQuery($params);
+        $this->assertCount(1, $result);
+
+        $params = [
+            'q' => [
+                'email' => $this->user1->email,
+                'first_name' => $this->user2->first_name
+            ]
+        ];
+
+        $result = Users::indexQuery($params);
+        $this->assertCount(2, $result);
+
+        $params = [
+            's' => 'id:asc'
+        ];
+
+        $result = Users::indexQuery($params);
+        $this->assertCount(7, $result);
+        $expected = [1, 2, 4, 5, $this->user1->id, $this->user2->id, $this->user3->id];
+        $this->assertEquals($expected, $result->pluck('id')->toArray());
+
+        $params = [
+            's' => 'id:desc'
+        ];
+
+        $result = Users::indexQuery($params);
+        $this->assertCount(7, $result);
+        $expected = [$this->user3->id, $this->user2->id, $this->user1->id, 5, 4, 2, 1];
+        $this->assertEquals($expected, $result->pluck('id')->toArray());
     }
 }
