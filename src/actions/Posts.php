@@ -27,6 +27,8 @@ class Posts
         // END
     }
 
+    // возвращает список постов с добавленной отметкой о том лайкал ли текущий пользователь
+    // этот пост или нет. $limit ограничивает количество постов.
     public static function index($user, $limit)
     {
         $posts = Post::limit($limit)->orderBy('created_at', 'desc')->get();
@@ -38,5 +40,10 @@ class Posts
         });
 
         return $result;
+    }
+    // возвращает список самых популярных (больше всего лайков) опубликованных постов
+    public static function indexPopular($user, $limit)
+    {
+        return $user->posts()->published()->likesLimit($limit);
     }
 }
